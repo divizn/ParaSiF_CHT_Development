@@ -4,4 +4,5 @@
 	branch = main
 [submodule "structure/src/heatSolverFenicsX"]
 	path = structure/src/heatSolverFenicsX
-	url = https://github.com/blairSmcc03/heatSolverFenicsX.git
+	url = https://github.com/divizn/heatSolverFenicsX.git
+	branch = master
