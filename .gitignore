@@ -15,3 +15,5 @@ heatSolverFEniCSx_OpenFOAM/*/fluid/postProcessing/
 heatSolverFEniCSx_OpenFOAM/*/fluid/processor*/
 heatSolverFEniCSx_OpenFOAM/*/fluid/dynamicCode/
 heatSolverFEniCSx_OpenFOAM/*/fluid/*.foam
+heatSolverFEniCSx_OpenFOAM/*/solid/output/
+heatSolverFEniCSx_OpenFOAM/*/run.log

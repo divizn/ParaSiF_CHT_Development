@@ -1,0 +1,16 @@
+#!/bin/sh
+
+cd ${0%/*} || exit 1
+
+
+rm -rf fluid/dynamicCode
+
+rm -r fluid/0
+rm -r fluid/postProcessing
+
+foamListTimes -rm -case fluid
+
+rm -rf fluid/constant/polyMesh fluid/fluid.foam solid/output
+
+
+#------------------------------------------------------------------------------
