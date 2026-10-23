@@ -17,7 +17,9 @@ This codebase is currently comprised of two solvers which are git submodules to 
 This code is still a work in progress, there several improvements that could be made such as:
 
 - Adding Aitken/fixed relaxation to the MUI fetch to improve convergence during strong coupling.
-- Adding RBF sampler for heat flux across interface to support non-conforming meshes
+- Using the RBF sampler on the FEniCSx side. It is implemented, but returns NaN when the fluid interface is a single row of faces, as in the one-cell-thick example cases.
+- Loading the solid mesh from a file, so the solid is not limited to a generated box.
+- Improving accuracy at the ends of the interface, where solid points lie beyond the last fluid face centre and no sampler extrapolates.
 - Re-integrate support for temporal sampling when using Strong Coupling (this is not really well defined)
 - Optimise FEniCSx Computational Efficiency.
 
@@ -85,6 +87,25 @@ You can then view the output in Paraview by opening "fluid/fluid.foam" and "soli
 To create a new case follow the existing format with the openfoam case in the "fluid" directory and a heatSolverFenicsX case (format specified in heatSolverFenicsX/README.md) in the "solid" directory.
 
 For now the mesh structure is limited to a simple box.
+
+Values are passed across the interface by MUI spatial samplers. Both sides default to linear interpolation (`pseudo_n2_linear`, search radius 0.2), so the solid and fluid meshes do not need to line up point for point at the interface. The sampler is selectable on each side:
+- FEniCSx side: `spatial_sampler` in `solid/input/solver.json` (see heatSolverFenicsX/README.md).
+- OpenFOAM side: `spatialSampler` on the coupled patch in `fluid/0.orig/T` (see customCHTBoundaryConditions/README.md). Setting it to `rbf` uses radial basis function interpolation.
+
+For the one-cell-thick example cases, the working combination is RBF on the OpenFOAM side and linear on the FEniCSx side. For a standalone example of the MUI RBF sampler, see [07-pseudo-diffusion](https://github.com/MxUI/MUI-demo/tree/master/07-pseudo-diffusion) in MUI-demo.
+
+### caseD: non-matching meshes with RBF
+
+caseD is caseB with a solid mesh that does not line up with the fluid at the interface: 7 solid cells along the interface against 10 fluid cells. It uses RBF on the OpenFOAM side and linear on the FEniCSx side, and runs in about 20 seconds.
+```bash
+cd heatSolverFEniCSx_OpenFOAM/caseD
+./Allrun
+paraview --script=view.py    # run from caseD
+python3 plot_interface.py    # needs h5py and matplotlib
+```
+`view.py` opens both meshes coloured by temperature, with mesh edges shown so the mismatch is visible. `plot_interface.py` plots the solid interface temperature against the values the fluid received at t = 146 s (pass another time as an argument) and saves it as `interface.png`. The nearest neighbour line in that plot is computed in the script from the solid values for comparison, it is not a separate run.
+
+The caseD `Allclean` also removes the generated mesh, the `fluid.foam` marker and `solid/output`.
 
 ## Contributing
 
